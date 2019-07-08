@@ -1,0 +1,1 @@
+../bin/getcontacts 1a9nR.pdb
