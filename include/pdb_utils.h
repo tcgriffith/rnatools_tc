@@ -109,6 +109,8 @@ namespace pdb_utils{
 //  calculate pdb
     double calc_RMSD();
 
+    std::string rna_tri2sin(const std::string &str_tri);
+
 }
 
 #endif

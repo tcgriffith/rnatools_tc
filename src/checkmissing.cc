@@ -76,10 +76,10 @@ void checkpdb(){
 
         for (auto & achain: astr->chains){
 
-            int last_res = stoi(achain.residues[0].get_resid());
+            int last_res = stoi(achain->residues[0]->get_resid());
 
-            for (auto & ares: achain.residues){
-                int curr_res = stoi(ares.get_resid());
+            for (auto & ares: achain->residues){
+                int curr_res = stoi(ares->get_resid());
 
                 cerr << curr_res << " " << last_res << endl;
 
@@ -90,12 +90,6 @@ void checkpdb(){
                 if(curr_res > last_res +1) {
                     is_breaking = true;
                     break;
-
-                // #if DEBUG
-
-                
-
-                // #endif
 
                 }
 

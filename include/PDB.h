@@ -82,7 +82,7 @@ protected:
     bool _miss_atom=false;
 
 public:
-    std::vector <atom> atoms={};
+    // std::vector <atom *> atoms={};
     std::unordered_map<string,atom *> atoms_map={};
     // lack_atoms initialized by check_atoms
     std::vector<string> lack_atoms = {};
@@ -114,7 +114,7 @@ public:
 
     // hydrogen atoms
 
-    bool addatom(atom &a_atom){atoms.push_back(a_atom); return 0;};
+    // bool addatom(atom *a_atom){atoms.push_back(a_atom); return 0;};
     bool addatom_tomap(atom *a_atom, string atomname){atoms_map.insert({atomname,a_atom}); return 0;};
     atom * get_atom(string an){
         if (atoms_map.find(an) !=atoms_map.end()) return atoms_map.at(an);
@@ -124,7 +124,7 @@ public:
         }
 
     };
-    virtual int atom_num(){return atoms.size();}
+    // virtual int atom_num(){return atoms.size();}
 
 
 
@@ -152,14 +152,14 @@ protected:
     std::string chainid;
 
 public:
-    std::vector<residue> residues;
+    std::vector<residue *> residues;
     chain(){this->chainid="RAGNAROK";};
     ~chain(){};
 
     void set_chainid(std::string cid){chainid = cid;}
     void set_chaintype(std::string ctype){chaintype=ctype;}
     virtual int get_residue_num(){return residues.size();}
-    bool add_residue(residue a_res){residues.push_back(a_res); return 0;};
+    bool add_residue(residue *a_res){residues.push_back(a_res); return 0;};
 
     std::string get_seq();
     std::string get_chainid(){return chainid;}
@@ -177,7 +177,7 @@ protected:
     bool _pair_inited = false;
 
 public:
-    std::vector<chain> chains;
+    std::vector<chain* > chains;
     structure(){};
 
     structure(std::string pdbfile){
@@ -192,7 +192,7 @@ public:
     int get_natom(){return natom;};
 
     virtual bool readpdb(std::string);
-    bool add_chain(chain &achain){chains.push_back(achain); return 0;};
+    bool add_chain(chain * achain){chains.push_back(achain); return 0;};
 
     // RNA specific
     // use virtual should make dfire_PDB working

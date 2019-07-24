@@ -18,7 +18,7 @@ LIB = -ldl #-lboost_filesystem -lboost_system
 
 INC = -I include #-I $(ROOT_BOOST)
 
-all: getseq getcontacts checkmissing
+all: getseq getcontacts #checkmissing
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.cc $(INCDIR)/%.h
 	@mkdir -p $(BUILDDIR)
@@ -36,5 +36,5 @@ getseq: $(OBJ_PDB) src/getseq.cc
 getcontacts: $(OBJ_PDB) src/getcontacts.cc
 	$(GCC) $^ $(CFLAGS)  $(INC)  $(LIB) $(LDFLAGS)  -o $(BINDIR)/getcontacts
 
-checkmissing: $(OBJ_PDB) src/checkmissing.cc
-	$(GCC) $^ $(CFLAGS)  $(INC)  $(LIB) $(LDFLAGS)  -o $(BINDIR)/checkmissing
+# checkmissing: $(OBJ_PDB) src/checkmissing.cc
+# 	$(GCC) $^ $(CFLAGS)  $(INC)  $(LIB) $(LDFLAGS)  -o $(BINDIR)/checkmissing

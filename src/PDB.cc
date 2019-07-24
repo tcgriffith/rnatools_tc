@@ -190,7 +190,8 @@ Xvec residue::rna_get_sideCOG() {
     Xvec cog=Xvec();
     double n = 0.0;
 
-    for (auto & aatom : this->atoms){
+    for (auto & it : this->atoms_map){
+        auto & aatom = * it.second;
         if (mc_atoms.count(aatom.get_name()) > 0) continue;
 
         cog = cog + aatom.get_x();
@@ -282,7 +283,7 @@ std::string chain::get_seq(){
     std::string seq="";
 
     for (int i = 0; i < this->get_residue_num(); ++i){
-        seq=seq+this->residues[i].get_ressin();
+        seq=seq+this->residues[i]->get_ressin();
     }
 
     // if (this->chaintype == "PROTEIN"){
@@ -338,40 +339,44 @@ bool structure::readpdb(std::string pdbname){
 
     nchain=nres=natom=0;
 
+    bool bool_TER = false;
+
+    string exp="";
+    string resol="";
 
 
     while(getline(fs,line)){
         if(line.substr(0,3) == "END") break;
-        if(line.substr(0,3) == "TER") continue;
-        if(line.substr(0,4) != "ATOM") continue;
+        // if(line.substr(0,3) == "TER") continue;
+        if(line.substr(0,3) == "TER") {
+            nchain ++;
+            bool_TER = true;
+            a_chain->add_residue(a_res);
+            this->add_chain(a_chain);
+            continue;
+        }
+        if(line.substr(0,4) == "ATOM" or line.substr(0,4) == "HETA" ){
 
-        rn = line.substr(17,3);
-        rn = misc::trim(rn);
-        rn = pdb_utils::format_rna(rn);
-        an = line.substr(13,3);
-        an = pdb_utils::format_rna(an);
+            // basic info
+            rn = pdb_utils::format_rna(misc::trim(line.substr(17,3)));
+            an = misc::trim(pdb_utils::format_rna(line.substr(13,3)));
+            scrd=line.substr(30,24);
+            alt = line.substr(16,1);
+            cid = line[21];
+            rid = misc::trim(line.substr(22,5));
 
-        alt = line.substr(16,1);
-        an = misc::trim(an);
-        cid=line[21];
-        rid = line.substr(22,5);
-        rid = misc::trim(rid);
+            if (alt != " "){
+                if (lastalt == "RAGNAROK!") lastalt = alt;
+                else if (alt != lastalt) {
+                    has_alt = true;
+                    continue;
+                }
 
-        if (alt != " "){
-            if (lastalt == "RAGNAROK!") lastalt = alt;
-            else if (alt != lastalt) {
-                has_alt = true;
-                continue;
             }
 
-        }
-
-        if (rid != lastrid || cid != lastcid){
-
-            if (cid != lastcid){
-                // cout << cid <<endl;
-                this->add_chain(*(new chain()));
-                a_chain =&(this->chains.back());
+            if (cid != lastcid or bool_TER){
+                // bool_TER =false;
+                a_chain = new chain();
                 a_chain->set_chainid(cid);
                 // guess chain type 
                 int type = pdb_utils::guess_ctype(rn);
@@ -379,60 +384,56 @@ bool structure::readpdb(std::string pdbname){
                 if (type == 0) a_chain->set_chaintype("PROTEIN");
                 else if (type == 1) a_chain->set_chaintype("NT");
                 lastcid = cid;
-                nchain++;
+                // nchain++;
             }
 
-            a_chain->add_residue(*(new residue()));
-            a_res = &(a_chain->residues.back());
-            a_res->set_name(rn);
-            a_res->set_resid(rid);
-        // make residue remember chainid
-            a_res->set_chainid(cid);
-        // set ressin for Protein and RNA
-            if (a_chain->get_chaintype() == "PROTEIN") {
-                string res_sin = pdb_utils::protein_tri2sin(rn);
-                a_res->set_ressin(res_sin);
-            }
-            if (a_chain->get_chaintype() == "NT") {
-                string res_sin = rn;
-                if (rn.length() > 1){
-                    res_sin = rn.back();
-                    cerr << "# warning: unknown RNA NT type: " << rn << " set as:" << res_sin << endl;
+            if (rid != lastrid){
+
+                if (lastrid != "RAGNAROK!"){
+                    a_chain->add_residue(a_res);
                 }
 
+                lastrid = rid;
+
+                // first residue
+                a_res = new residue();
+
+                a_res->set_name(rn);
+                a_res->set_resid(rid);
+            // make residue remember chainid
+                a_res->set_chainid(cid);
+            // set ressin for Protein and RNA
+                string res_sin="X";
+                if (a_chain->get_chaintype() == "PROTEIN") res_sin = pdb_utils::protein_tri2sin(rn);
+                if (a_chain->get_chaintype() == "NT") res_sin = pdb_utils::rna_tri2sin(rn);
                 a_res->set_ressin(res_sin);
             }
 
-            lastrid = rid;
-            nres++;
+            a_atom = new atom();
+
+            
+            // a_atom = &(a_res->atoms.back());
+            
+            a_atom->set_x(scrd);
+            a_atom->set_name(an);
+            a_atom->set_type(rn+"_"+an);
+
+            a_res->addatom_tomap(a_atom, an); 
+
+            natom++;
+
         }
-
-        a_atom = new atom();
-
-        
-        // a_atom = &(a_res->atoms.back());
-        scrd=line.substr(30,24);
-        a_atom->set_x(scrd);
-        a_atom->set_name(an);
-        a_atom->set_type(rn+"_"+an);
-
-        a_res->addatom( *a_atom);
-
-        natom++;
     }
 
     fs.close();
 
-    int ridsd =0;
+    // debug
+    // cerr << this->chains.size() << endl;
 
-    for(auto & achain: this->chains) {
-        ridsd =0;
-        for ( auto & aresidue : achain.residues){
-            aresidue.set_residsd(ridsd++);
-            for (auto & aatom : aresidue.atoms ){
-                aresidue.addatom_tomap( &aatom, aatom.get_name());
-            }
-        }
+
+    // warnings
+    if (nchain < 1){
+        cerr << "# Warning: no chain detected, missing TER? " << pdbname << endl; 
     }
     if (has_alt) {
         cerr << "# Warning: alternative conformation detected. First alt conformation used; File: " << pdbname  << endl;
@@ -450,17 +451,17 @@ bool structure::rna_init_pairs(){
 
     for (auto & achain : this->chains){
         for (auto & bchain: this->chains){
-            for (auto & ares : achain.residues){
-                for (auto & bres : bchain.residues){
+            for (auto & ares : achain->residues){
+                for (auto & bres : bchain->residues){
 
-                    if (achain.get_chainid() > bchain.get_chainid()) continue;
-                    if (achain.get_chainid() == bchain.get_chainid()){
-                        if (ares.get_residsd() >= bres.get_residsd()) continue;
+                    if (achain->get_chainid() > bchain->get_chainid()) continue;
+                    if (achain->get_chainid() == bchain->get_chainid()){
+                        if (ares->get_residsd() >= bres->get_residsd()) continue;
                     }
 
-                    if (ares.is_rna_pair(bres)){
+                    if (ares->is_rna_pair(*bres)){
 
-                        this->pairs.push_back(pair<residue *, residue *>(&ares,&bres));
+                        this->pairs.push_back(pair<residue *, residue *>(ares,bres));
 
                     }
 
@@ -478,26 +479,27 @@ bool structure::rna_init_polar(){
 
     // unordered_set<char> polar_set = {'O','N','P'};
     for(auto & achain: this->chains){
-        for (int i=0; i < achain.residues.size(); i++){
+        for (int i=0; i < achain->residues.size(); i++){
 
 
-            residue * a_res = &achain.residues.at(i);
+            residue * a_res = achain->residues.at(i);
             residue * next_res;
     // residues should pass atoms check
             if (!a_res->rna_check_atoms()) continue;
 
-            if (i + 1 < achain.residues.size()) next_res = &achain.residues.at(i+1);
+            if (i + 1 < achain->residues.size()) next_res = achain->residues.at(i+1);
             else next_res =nullptr;
 
 
-            for (auto & a_atom : a_res->atoms){
-                string atype = a_atom.get_type();
+            for (auto & it : a_res->atoms_map){
+                auto & a_atom = it.second;
+                string atype = a_atom->get_type();
                 if (pdb_utils::is_rna_polar_atom(atype)) {
-                    a_atom.set_polar(true);
+                    a_atom->set_polar(true);
  
                     Xvec r_ref;
 
-                    Xvec a_atom_vec = Xvec(a_atom.get_x());
+                    Xvec a_atom_vec = Xvec(a_atom->get_x());
 
                     for (auto & nb_atom_name : pdb_utils::rna_atom_neighbors.at(atype)){
 
@@ -520,7 +522,7 @@ bool structure::rna_init_polar(){
                         r_ref = r_ref + a_atom_vec - nb_atom_vec;
                     }
 
-                    a_atom.set_pvec(r_ref);
+                    a_atom->set_pvec(r_ref);
                 }
             }
         }

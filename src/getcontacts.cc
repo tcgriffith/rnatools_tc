@@ -54,22 +54,24 @@ void get_contacts_nearatom() {
         // we assume all RNAs to be single-chains
         // use C4'
         for (auto & achain: astr->chains){
-            for (auto & ares: achain.residues){
-                for (auto & bres: achain.residues){
+            for (auto & ares: achain->residues){
+                for (auto & bres: achain->residues){
                     // if (&ares == &bres) continue;
-                    if (ares.get_residsd() >= bres.get_residsd()) continue;
+                    if (ares->get_residsd() >= bres->get_residsd()) continue;
 
                     // double d = ares.get_atom("C4'")->distance(*bres.get_atom("C4'"));
-                    double d1 = (ares.rna_get_sideCOG() - bres.rna_get_sideCOG()).normalize();
+                    double d1 = (ares->rna_get_sideCOG() - bres->rna_get_sideCOG()).normalize();
                     double min_d = 100000;
-                    for (auto & aatom: ares.atoms){
-                        for (auto & batom: bres.atoms){
+                    for (auto & a: ares->atoms_map){
+                        auto & aatom = * a.second; 
+                        for (auto & b: bres->atoms_map){
+                            auto & batom = * b.second; 
                             double d = aatom.distance2(batom);
                             if (d < min_d) min_d = d;
                         }
                     }
 
-                    printf("%s\t%s\t%8.6f\t%8.6f\n", ares.get_resid().c_str(),bres.get_resid().c_str(), d1, sqrt(min_d));
+                    printf("%s\t%s\t%8.6f\t%8.6f\n", ares->get_resid().c_str(),bres->get_resid().c_str(), d1, sqrt(min_d));
                 }
             }
         }
@@ -90,18 +92,11 @@ void get_contacts(){
         // we assume all RNAs to be single-chains
         // use C4'
         for (auto & achain: astr->chains){
-            for (auto & ares: achain.residues){
-                for (auto & bres: achain.residues){
-                    // if (&ares == &bres) continue;
-                    if (ares.get_residsd() >= bres.get_residsd()) continue;
-
-                    // double d = ares.get_atom("C4'")->distance(*bres.get_atom("C4'"));
-                    double d = (ares.rna_get_sideCOG() - bres.rna_get_sideCOG()).normalize();
-        
-
-
-
-                    printf("%s\t%s\t%8.6f\n", ares.get_resid().c_str(),bres.get_resid().c_str(), d);
+            for (auto & ares: achain->residues){
+                for (auto & bres: achain->residues){
+                    if (ares->get_residsd() >= bres->get_residsd()) continue;
+                    double d = (ares->rna_get_sideCOG() - bres->rna_get_sideCOG()).normalize();
+                    printf("%s\t%s\t%8.6f\n", ares->get_resid().c_str(),bres->get_resid().c_str(), d);
                 }
             }
         }

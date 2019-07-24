@@ -42,7 +42,15 @@ namespace pdb_utils{
         {"PPU", "U" },
         {"PSU", "U" },
         {"UD5", "U" },
-        {"YG", "G" },  
+        {"CCC", "C" },
+        {"YG", "G" },
+        {"rC","C"},
+        {"rU","U"},
+        {"rG","G"},
+        {"rA","A"},
+        {"GTP", "G"},
+        {"GDP", "G"},
+        {"YYG", "G"}
     });
 
 
@@ -571,7 +579,7 @@ namespace pdb_utils{
             return search->second;
         }
         else {
-            std::cerr << &str_tri << " not found" << std::endl;
+            std::cerr << "RNA NT " << str_tri << " not found" << std::endl;
             return "X";
         }        
     }

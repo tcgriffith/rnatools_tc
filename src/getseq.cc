@@ -88,7 +88,7 @@ void getseq_by_chain(){
 
             // char tmp[8000];
 
-            sprintf(sout, "%s> %s %s %d\n%s\n", sout,name.c_str(), achain.get_chainid().c_str(), achain.get_residue_num(),achain.get_seq().c_str());
+            sprintf(sout, "%s> %s %s %d\n%s\n", sout,name.c_str(), achain->get_chainid().c_str(), achain->get_residue_num(),achain->get_seq().c_str());
 
             // string fasta_info = "> " + name + " "+achain.get_chainid() + " " +to_string(achain.get_residue_num());
 
@@ -127,10 +127,10 @@ void getseq_by_pdb(){
 
         for (auto & achain: astr->chains){
             // boost::filesystem::path p(apdb);
-            if (!ctypes.count(achain.get_chaintype())){
-                ctypes.insert(achain.get_chaintype());
+            if (!ctypes.count(achain->get_chaintype())){
+                ctypes.insert(achain->get_chaintype());
             }
-            seq = seq + achain.get_seq();
+            seq = seq + achain->get_seq();
 
 
         }
@@ -158,8 +158,8 @@ void getseq_outmap() {
         // string seq = "";
 
         for (auto & achain: astr->chains){
-            for (auto & ares: achain.residues){
-                cout << ares.get_resid() << "\t" << ares.get_resname() << endl;
+            for (auto & ares: achain->residues){
+                cout << ares->get_resid() << "\t" << ares->get_resname() << endl;
             }
         }
 
