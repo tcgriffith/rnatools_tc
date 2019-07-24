@@ -106,7 +106,7 @@
 5IC     c
 5IU     u
 5MC     c
-5MU     tu
+5MU     u
 5NC     c
 5OC     c
 5PC     c

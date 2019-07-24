@@ -157,7 +157,26 @@ void getseq_outmap() {
         // string fasta_info = "> " + name + " " +to_string(astr->get_nres());
         // string seq = "";
 
+
+
         for (auto & achain: astr->chains){
+            // auto & first_res = achain->residues.front();
+            // auto & last_res = achain->residues.back();
+
+            // int first = stoi(first_res->get_resid());
+
+            // int last = stoi(last_res->get_resid());
+
+            // for (int i = 0; i < achain->residues.size(); ++i)
+            // {
+            //     int resid
+
+            //     // cout << ares->get_resid() << "\t" << ares->get_resname() << endl;
+            //     /* code */
+            // }
+
+
+
             for (auto & ares: achain->residues){
                 cout << ares->get_resid() << "\t" << ares->get_resname() << endl;
             }

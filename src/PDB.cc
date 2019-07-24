@@ -351,7 +351,7 @@ bool structure::readpdb(std::string pdbname){
         if(line.substr(0,3) == "TER") {
             nchain ++;
             bool_TER = true;
-            a_chain->add_residue(a_res);
+            // a_chain->add_residue(a_res);
             this->add_chain(a_chain);
             continue;
         }
@@ -375,7 +375,7 @@ bool structure::readpdb(std::string pdbname){
             }
 
             if (cid != lastcid or bool_TER){
-                // bool_TER =false;
+                bool_TER =false;
                 a_chain = new chain();
                 a_chain->set_chainid(cid);
                 // guess chain type 
@@ -389,14 +389,15 @@ bool structure::readpdb(std::string pdbname){
 
             if (rid != lastrid){
 
-                if (lastrid != "RAGNAROK!"){
-                    a_chain->add_residue(a_res);
-                }
+                // if (lastrid != "RAGNAROK!"){
+                //     a_chain->add_residue(a_res);
+                // }
 
                 lastrid = rid;
 
                 // first residue
                 a_res = new residue();
+                a_chain-> add_residue(a_res);
 
                 a_res->set_name(rn);
                 a_res->set_resid(rid);
