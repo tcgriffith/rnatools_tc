@@ -50,6 +50,8 @@ void get_contacts_nearatom() {
         for (string apdb : PARAM::pdblist){
         std::unordered_set<string> ctypes = {};
         structure * astr = new structure(apdb);
+
+
         
         // we assume all RNAs to be single-chains
         // use C4'
@@ -71,7 +73,7 @@ void get_contacts_nearatom() {
                         }
                     }
 
-                    printf("%s\t%s\t%8.6f\t%8.6f\n", ares->get_resid().c_str(),bres->get_resid().c_str(), d1, sqrt(min_d));
+                    printf("%s\t%s\t%8.6f\t%8.6f\n", ares->get_resfullname().c_str(),bres->get_resfullname().c_str(), d1, sqrt(min_d));
                 }
             }
         }

@@ -324,9 +324,12 @@ bool structure::readpdb(std::string pdbname){
     string lastcid="RAGNAROK!";
     string lastalt="RAGNAROK!";
     string lastalt_res = "KARAGE!";
+    string insert=" ";
     string rid;
     string cid;
     string scrd;
+
+    int residsd = 1;
 
     string alt;
     bool has_alt = false;
@@ -363,7 +366,13 @@ bool structure::readpdb(std::string pdbname){
             scrd=line.substr(30,24);
             alt = line.substr(16,1);
             cid = line[21];
-            rid = misc::trim(line.substr(22,5));
+            rid = misc::trim(line.substr(22,4));
+            insert = line.substr(26,1);
+
+            if(insert != " "){
+                rid= rid +"^"+insert;
+            }
+
 
             if (alt != " "){
                 if (lastalt == "RAGNAROK!") lastalt = alt;
@@ -384,7 +393,9 @@ bool structure::readpdb(std::string pdbname){
                 if (type == 0) a_chain->set_chaintype("PROTEIN");
                 else if (type == 1) a_chain->set_chaintype("NT");
                 lastcid = cid;
-                // nchain++;
+
+                residsd = 1;
+
             }
 
             if (rid != lastrid){
@@ -401,13 +412,17 @@ bool structure::readpdb(std::string pdbname){
 
                 a_res->set_name(rn);
                 a_res->set_resid(rid);
+                a_res->set_residsd(residsd++);
+                a_res->set_resfullname(cid+"."+rn+rid);
             // make residue remember chainid
+            // set residsd 1 base
                 a_res->set_chainid(cid);
             // set ressin for Protein and RNA
                 string res_sin="X";
                 if (a_chain->get_chaintype() == "PROTEIN") res_sin = pdb_utils::protein_tri2sin(rn);
                 if (a_chain->get_chaintype() == "NT") res_sin = pdb_utils::rna_tri2sin(rn);
                 a_res->set_ressin(res_sin);
+                nres ++;
             }
 
             a_atom = new atom();

@@ -79,6 +79,11 @@ void getseq_by_chain(){
     for (int i = 0; i < ne; i++){
         string apdb =PARAM::pdblist[i];
         structure * astr = new structure(apdb);
+
+        // debug
+        cout << astr->get_nres() << endl;
+
+
         char sout[8000] = "";
         for (auto & achain: astr->chains){
 

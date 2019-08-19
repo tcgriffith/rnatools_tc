@@ -76,6 +76,7 @@ protected:
     std::string resname;
     std::string restri;
     std::string ressin;
+    std::string resfullname;
     int resint;
     std::string ss;
 
@@ -109,6 +110,10 @@ public:
 
     void set_ss(std::string a_ss){ss=a_ss;};
     std::string get_ss() {return ss;};
+
+    void set_resfullname(std::string a_full){resfullname=a_full;};
+    std::string get_resfullname() {return resfullname;};
+
 
     // virtual bool check_atoms(std::string name);
 

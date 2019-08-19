@@ -724,8 +724,8 @@ namespace pdb_utils{
         {"rA","A"},
 
         // add GTP -> G
-        {"GTP", "G"},
-        {"GDP", "G"},
+        // {"GTP", "G"},
+        // {"GDP", "G"},
     });
 
 
@@ -1105,7 +1105,7 @@ namespace pdb_utils{
             return polartype[atype_s];
         }
         else{
-            std::cerr << "polartype error: "<<  atype_s << " not found" << std::endl;
+            std::cerr << "## polartype error: "<<  atype_s << " not found" << std::endl;
             return -1;
         }        
     }
@@ -1116,7 +1116,7 @@ namespace pdb_utils{
             return atomtype[atype_s];
         }
         else{
-            std::cerr << "atomtype error " <<atype_s << " not found" << std::endl;
+            std::cerr << "## atomtype error " <<atype_s << " not found" << std::endl;
             return -1;
         }
     }
@@ -1137,7 +1137,7 @@ namespace pdb_utils{
             return search->second;
         }
         else {
-            std::cerr << &str_tri << " not found" << std::endl;
+            std::cerr <<"## AA " << str_tri << " not found" << std::endl;
             return "X";
         }
 
